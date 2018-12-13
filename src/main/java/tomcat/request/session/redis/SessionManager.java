@@ -312,4 +312,8 @@ public class SessionManager extends ManagerBase implements Lifecycle {
         }
         throw new RuntimeException("Error occurred while creating container instance");
     }
+    
+    public void deleteSession(String sessionId){
+        this.dataCache.delete(sessionId);
+    }
 }

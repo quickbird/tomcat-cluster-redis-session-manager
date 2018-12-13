@@ -10,6 +10,8 @@ import java.util.Map;
 
 import org.apache.catalina.Manager;
 import org.apache.catalina.session.StandardSession;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import tomcat.request.session.redis.SessionManager;
 
@@ -17,6 +19,8 @@ import tomcat.request.session.redis.SessionManager;
 public class Session extends StandardSession {
 
     private static final long serialVersionUID = -6056744304016869278L;
+    
+    private static final Log LOGGER = LogFactory.getLog(Session.class);
 
     private Boolean dirty;
     private Map<String, Object> changedAttributes;
@@ -129,6 +133,10 @@ public class Session extends StandardSession {
     /** {@inheritDoc} */
     @Override
     public void invalidate() {
+        LOGGER.info("======================invalid session===================");
+        if (this.manager instanceof SessionManager) {
+            ((SessionManager) this.manager).deleteSession(super.getId());;
+        }
         super.invalidate();
     }
 }

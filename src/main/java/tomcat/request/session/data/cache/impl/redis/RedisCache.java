@@ -1,5 +1,12 @@
 package tomcat.request.session.data.cache.impl.redis;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
@@ -8,17 +15,12 @@ import tomcat.request.session.data.cache.DataCacheConstants;
 import tomcat.request.session.data.cache.DataCacheConstants.RedisConfigType;
 import tomcat.request.session.data.cache.DataCacheFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
 /** author: Ranjith Manickam @ 12 Jul' 2018 */
 public class RedisCache implements DataCache {
 
     private DataCache dataCache;
+    
+    private String keyPrefix;
 
     public RedisCache(Properties properties) {
         initialize(properties);
@@ -27,31 +29,31 @@ public class RedisCache implements DataCache {
     /** {@inheritDoc} */
     @Override
     public byte[] set(String key, byte[] value) {
-        return dataCache.set(key, value);
+        return dataCache.set(keyPrefix + key, value);
     }
 
     /** {@inheritDoc} */
     @Override
     public Long setnx(String key, byte[] value) {
-        return dataCache.setnx(key, value);
+        return dataCache.setnx(keyPrefix + key, value);
     }
 
     /** {@inheritDoc} */
     @Override
     public Long expire(String key, int seconds) {
-        return dataCache.expire(key, seconds);
+        return dataCache.expire(keyPrefix + key, seconds);
     }
 
     /** {@inheritDoc} */
     @Override
     public byte[] get(String key) {
-        return dataCache.get(key);
+        return dataCache.get(keyPrefix + key);
     }
 
     /** {@inheritDoc} */
     @Override
     public Long delete(String key) {
-        return dataCache.delete(key);
+        return dataCache.delete(keyPrefix + key);
     }
 
     private void initialize(Properties properties) {
@@ -63,6 +65,8 @@ public class RedisCache implements DataCache {
         } else {
             configType = RedisConfigType.DEFAULT;
         }
+        
+        keyPrefix = DataCacheFactory.getProperty(properties, DataCacheConstants.REDIS_KEY_PREFIX);
 
         String hosts = DataCacheFactory.getProperty(properties, DataCacheConstants.REDIS_HOSTS, String.format("%s:%s", Protocol.DEFAULT_HOST, Protocol.DEFAULT_PORT));
         Collection<?> nodes = getJedisNodes(hosts, configType);
@@ -107,11 +111,14 @@ public class RedisCache implements DataCache {
         boolean testOnReturn = Boolean.parseBoolean(DataCacheFactory.getProperty(properties, DataCacheConstants.REDIS_TEST_ONRETURN));
         poolConfig.setTestOnReturn(testOnReturn);
 
-        int maxIdle = Integer.parseInt(DataCacheFactory.getProperty(properties, DataCacheConstants.REDIS_MAX_ACTIVE));
+        int maxIdle = Integer.parseInt(DataCacheFactory.getProperty(properties, DataCacheConstants.REDIS_MAX_IDLE));
         poolConfig.setMaxIdle(maxIdle);
-
+        
         int minIdle = Integer.parseInt(DataCacheFactory.getProperty(properties, DataCacheConstants.REDIS_MIN_IDLE));
         poolConfig.setMinIdle(minIdle);
+        
+        long maxWaitMillis = Long.parseLong(DataCacheFactory.getProperty(properties, DataCacheConstants.REDIS_MAX_WAIT_MILLIS));
+        poolConfig.setMaxWaitMillis(maxWaitMillis);
 
         boolean testWhileIdle = Boolean.parseBoolean(DataCacheFactory.getProperty(properties, DataCacheConstants.REDIS_TEST_WHILEIDLE));
         poolConfig.setTestWhileIdle(testWhileIdle);

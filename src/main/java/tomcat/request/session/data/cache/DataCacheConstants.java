@@ -5,6 +5,8 @@ public interface DataCacheConstants {
 
     // redis properties file name
     String APPLICATION_PROPERTIES_FILE = "redis-data-cache.properties";
+    
+    String REDIS_KEY_PREFIX = "redis.key.prefix";
 
     // redis properties
     String REDIS_HOSTS = "redis.hosts";
@@ -17,6 +19,7 @@ public interface DataCacheConstants {
     String REDIS_TEST_ONRETURN = "redis.test.onReturn:true";
     String REDIS_MAX_IDLE = "redis.max.idle:5";
     String REDIS_MIN_IDLE = "redis.min.idle:1";
+    String REDIS_MAX_WAIT_MILLIS = "redis.max.wait.millis:1000";
     String REDIS_TEST_WHILEIDLE = "redis.test.whileIdle:true";
     String REDIS_TEST_NUMPEREVICTION = "redis.test.numPerEviction:10";
     String REDIS_TIME_BETWEENEVICTION = "redis.time.betweenEviction:60000";

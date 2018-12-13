@@ -27,3 +27,8 @@ hs_err_pid*
 target/
 *.iws
 *.iml
+
+# eclipse
+.classpath
+.project
+.settings
